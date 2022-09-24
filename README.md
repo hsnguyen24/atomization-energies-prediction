@@ -12,10 +12,12 @@ We can either represent the data as a graph by a (weighted) adjacency matrix (as
 ## Molecular descriptor
 
 A conventional way to represent molecules is to use Coulomb matrix
-$$C = [C_{ij}]_{1 \leq i, j \leq 23}$$ [1]:
+$C = [C_{ij}]_{1 \leq i, j \leq 23}$ [1]:
+
 $$
 C_{ij} = \left\{\begin{matrix} 0.5Z_{i}^{2.4} & \text{ if $i = j$}\\ Z_iZ_j/|\mathbf{R}_i - \mathbf{R}_j| & \text{ if $i \neq j$} \end{matrix}\right.
 $$
+
 where $$Z_i$$ is the nuclear charge of atom $i$ and $R_i$ is its Cartesian coordinates. Informally speaking, diagonal entries of Coulomb matrix represents strength of nuclear charge of each atom in the molecule, and the off-diagonal entries describe the interaction between two atoms based on their nuclear charges (with sign) and their absolute distance.
 
 **Limitations.** Although Coulomb matrix is invariant to translation and rotation of the molecule, it is *not invariant to permutation of atoms indices*. In addition, Coulomb matrices may have different sizes, but this is not a problem since in QM7 dataset we are only considering molecules with $23$ atoms. Lastly, molecular representation by Coulomb matrices alone misses many important features as a molecule lives in a continuous 3D space (e.g., Coulomb matrix misses angular information between atoms; consideration of rotational-invariance and equivariance).
@@ -53,9 +55,9 @@ Since each molecule has different number of atoms, their true Coulomb matrices h
 
 **Sorting Coulomb matrix.** Since the ordering of atoms in the Coulomb matrix can be arbitrary, we would like to impose a specific row order on Coulomb matrices. One way to achieve this is to pick the permutation of atoms in Coulomb matrix $C$ such that
 
-$
+$$
 ||C_i||_2 \leq ||C_{i+1}||_2
-$
+$$
 
 with $C_i$ being the $i^{th}$ row of $C$. Note that two different molecules have necessarily different associated sorted Coulomb matrices [1, Section 2.2].
 
@@ -69,12 +71,12 @@ entries of the Coulomb matrix (e.g., by flattening the Coulomb matrix into a fea
 
 **Eigenvalues and Eigenvectors.** One approach to incorporate graph-topology feature is to consider adding eigenvalues and
 eigenvectors of the Coulomb matrix as a feature. We recall that eigenvalues and eigenvectors of an adjacency matrix can capture
-community structure of a graph, a fact that is leveraged in spectral clustering [@luxberg]. On a side note, due to Spectral Theorem, the
+community structure of a graph, a fact that is leveraged in spectral clustering [5]. On a side note, due to Spectral Theorem, the
 (weighted) adjacency matrix has a full real-valued eigenbasis.
 
 **Eigen-centralities.** Another information regarding graph topology we can include into training is centralities [6, Chapter 7] of each node. For example, we can include eigen-centrality into the feature vector.
 
-**Other features.** There are other measures w.r.t. a graph that we can use for feature engineering. Generally, the main types of hand-crafted features are: node-level features (degree, motif counts, clustering coefficient, etc.), graph-level features (graph kernels such as graphlet kernels, Weisfeiler-Lehman kernel [@wlkernel], etc.) and link-level features (shortest-path distances, local neighborhood overlap, Katz index, etc.). For a review of graph features, see [6, Chapter 7].
+**Other features.** There are other measures w.r.t. a graph that we can use for feature engineering. Generally, the main types of hand-crafted features are: node-level features (degree, motif counts, clustering coefficient, etc.), graph-level features (graph kernels such as graphlet kernels, Weisfeiler-Lehman kernel [7], etc.) and link-level features (shortest-path distances, local neighborhood overlap, Katz index, etc.). For a review of graph features, see [6, Chapter 7].
 
 **Results.** In our experiments, we simply concatenate the eigenvalues/eigenvectors and the eigencentralities with the flatten
 Coulomb matrix to obtain a dataset of $7165$ examples with $1104$ features instead of $23 \times 23 = 529$ features. The results are
@@ -137,9 +139,9 @@ Instead of vanilla neural network, we now construct a convolutional neural netwo
 Furthermore, following [1, Section 3.2], we convert the real-valued entries $c$ of Coulomb matrix to a \"binarized\" vector
 $\hat{\mathbf{c}}$:
 
-$
+$$
 \hat{\mathbf{c}} = \left[..., tanh\left(\frac{c-\theta}{\theta}\right), tanh\left(\frac{c}{\theta}\right), tanh\left(\frac{c+\theta}{\theta}\right), ...\right]
-$
+$$
 
 In this way, the data representation in Coulomb matrices are more flexible, (hopefully) enabling a better performance for neural network.
 
