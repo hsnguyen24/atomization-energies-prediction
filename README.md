@@ -15,10 +15,10 @@ A conventional way to represent molecules is to use Coulomb matrix
 $C = [C_{ij}]_{1 \leq i, j \leq 23}$ [1], with the entries being:
 
 $$
-C_{ij} = Z_iZ_j/|\mathbf{R}_i - \mathbf{R}_j|,\;$i \neq j$; C_{ii} = 0.5Z_{i}^{2.4}.
+C_{ij} = Z_{i}Z_{j}/|\mathbf{R}_{i} - \mathbf{R}_{j}|,\;i \neq j;\;C_{ii} = 0.5Z_{i}^{2.4}.
 $$
 
-where $Z_i$ is the nuclear charge of atom $i$ and $R_i$ is its Cartesian coordinates. Informally speaking, diagonal entries of Coulomb matrix represents strength of nuclear charge of each atom in the molecule, and the off-diagonal entries describe the interaction between two atoms based on their nuclear charges (with sign) and their absolute distance.
+where $Z_{i}$ is the nuclear charge of atom $i$ and $R_{i}$ is its Cartesian coordinates. Informally speaking, diagonal entries of Coulomb matrix represents strength of nuclear charge of each atom in the molecule, and the off-diagonal entries describe the interaction between two atoms based on their nuclear charges (with sign) and their absolute distance.
 
 **Limitations.** Although Coulomb matrix is invariant to translation and rotation of the molecule, it is *not invariant to permutation of atoms indices*. In addition, Coulomb matrices may have different sizes, but this is not a problem since in QM7 dataset we are only considering molecules with $23$ atoms. Lastly, molecular representation by Coulomb matrices alone misses many important features as a molecule lives in a continuous 3D space (e.g., Coulomb matrix misses angular information between atoms; consideration of rotational-invariance and equivariance).
 
@@ -59,7 +59,7 @@ $$
 ||C_{i}||_2 \leq ||C_{i+1}||_{2}
 $$
 
-with $C_i$ being the $i^{th}$ row of $C$. Note that two different molecules have necessarily different associated sorted Coulomb matrices [1, Section 2.2].
+with $C_{i}$ being the $i^{th}$ row of $C$. Note that two different molecules have necessarily different associated sorted Coulomb matrices [1, Section 2.2].
 
 **Using permutation invariant/equivariant algorithms.** Another method is to use permutation invariant or equivariant algorithms. Formal
 definitions of invariance and equivariance are given in [2, Def. 5 and 6]. For example, graph filters embedding [3, Proposition 1] and graph neural network (GNN) [3, Proposition 2] are permutation equivariant without pooling layer, and permutation invariant with pooling layer. With graph filters and graph neural networks, we can ensure that the embedding of a molecule can be equivalent up to permutations. More generally, [4] discuss invariant/equivariant GNNs with general linear layer (instead of traditional polynomial graph filter).
@@ -86,9 +86,9 @@ however worse when we include the new features. This might be due to two reasons
 
 To resolve the problem of arbitrary permutation of atoms, [1] proposes the following procedure to generate random (and sorted) Coulomb matrices:
 
-1.  Take a Coulomb matrix $C \in \mathbb{R}^{d \times d}$ and compute the row norms $(||C_1||, ..., ||C_d||)$
+1.  Take a Coulomb matrix $C \in \mathbb{R}^{d \times d}$ and compute the row norms $(||C_{1}||, ..., ||C_{d}||)$
 
-2.  Draw $n \sim N(0, \sigma I)$ and find the permutation $P$ that sorts $C$ according to the new row norms $(||C_1||+n, ..., ||C_d||+n)$
+2.  Draw $n \sim N(0, \sigma I)$ and find the permutation $P$ that sorts $C$ according to the new row norms $(||C_{1}||+n, ..., ||C_{d}||+n)$
 
 3.  Permute the rows and columns according to $P$
 
