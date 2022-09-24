@@ -12,13 +12,13 @@ We can either represent the data as a graph by a (weighted) adjacency matrix (as
 ## Molecular descriptor
 
 A conventional way to represent molecules is to use Coulomb matrix
-$C = [C_{ij}]_{1 \leq i, j \leq 23}$ [1]:
+$C = [C_{ij}]_{1 \leq i, j \leq 23}$ [1], with the entries being:
 
 $$
-C_{ij} = \left\{\begin{matrix} 0.5Z_{i}^{2.4} & \text{ if $i = j$}\\ Z_iZ_j/|\mathbf{R}_i - \mathbf{R}_j| & \text{ if $i \neq j$} \end{matrix}\right.
+C_{ij} = Z_iZ_j/|\mathbf{R}_i - \mathbf{R}_j|,\;$i \neq j$; C_{ii} = 0.5Z_{i}^{2.4}.
 $$
 
-where $$Z_i$$ is the nuclear charge of atom $i$ and $R_i$ is its Cartesian coordinates. Informally speaking, diagonal entries of Coulomb matrix represents strength of nuclear charge of each atom in the molecule, and the off-diagonal entries describe the interaction between two atoms based on their nuclear charges (with sign) and their absolute distance.
+where $Z_i$ is the nuclear charge of atom $i$ and $R_i$ is its Cartesian coordinates. Informally speaking, diagonal entries of Coulomb matrix represents strength of nuclear charge of each atom in the molecule, and the off-diagonal entries describe the interaction between two atoms based on their nuclear charges (with sign) and their absolute distance.
 
 **Limitations.** Although Coulomb matrix is invariant to translation and rotation of the molecule, it is *not invariant to permutation of atoms indices*. In addition, Coulomb matrices may have different sizes, but this is not a problem since in QM7 dataset we are only considering molecules with $23$ atoms. Lastly, molecular representation by Coulomb matrices alone misses many important features as a molecule lives in a continuous 3D space (e.g., Coulomb matrix misses angular information between atoms; consideration of rotational-invariance and equivariance).
 
@@ -56,7 +56,7 @@ Since each molecule has different number of atoms, their true Coulomb matrices h
 **Sorting Coulomb matrix.** Since the ordering of atoms in the Coulomb matrix can be arbitrary, we would like to impose a specific row order on Coulomb matrices. One way to achieve this is to pick the permutation of atoms in Coulomb matrix $C$ such that
 
 $$
-||C_i||_2 \leq ||C_{i+1}||_2
+||C_{i}||_2 \leq ||C_{i+1}||_{2}
 $$
 
 with $C_i$ being the $i^{th}$ row of $C$. Note that two different molecules have necessarily different associated sorted Coulomb matrices [1, Section 2.2].
