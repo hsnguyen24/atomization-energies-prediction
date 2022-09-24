@@ -2,23 +2,12 @@
 
 ## Machine learning for quantum chemistry
 
-A crucial task in chemical compound design is to accurately predict
-molecular energetics. To circumvent computational cost, machine learning
-techniques are employed to speed-up the process while maintaining
-accuracy. The goal is to learn a map from a molecule to its atomization
-energy.
+A crucial task in chemical compound design is to accurately predict molecular energetics. To circumvent computational cost, machine learning techniques are employed to speed-up the process while maintaining accuracy. The goal is to learn a map from a molecule to its atomization energy.
 
-In the language of machine learning, each molecule is represented by an
-undirected simple graph, where each node (atom) having a *nuclear
-charge* feature and each edge is weighted by *distance between two nodes
-(atoms)*. Our target function is a map between each graph (molecule) to
-a value called *atomization energy*. Hence, a possible perspective is
-that we are dealing with graph-level regression task.
+In the language of machine learning, each molecule is represented by an undirected simple graph, where each node (atom) having a *nuclear
+charge* feature and each edge is weighted by *distance between two nodes (atoms)*. Our target function is a map between each graph (molecule) to a value called *atomization energy*. Hence, a possible perspective is that we are dealing with graph-level regression task.
 
-We can either represent the data as a graph by a (weighted) adjacency
-matrix (as in the case of graph neural network), or simply flatten the
-nodes and the edges in the adjacency matrix of the molecular graph as
-our features for conventional machine learning methods.
+We can either represent the data as a graph by a (weighted) adjacency matrix (as in the case of graph neural network), or simply flatten the nodes and the edges in the adjacency matrix of the molecular graph as our features for conventional machine learning methods.
 
 ## Molecular descriptor
 
@@ -63,9 +52,11 @@ Since each molecule has different number of atoms, their true Coulomb matrices h
 **(Dimensionality reduction by) eigenvalues/eigenvectors.** An approach is to compute the eigenvectors and the eigenvalues of the Coulomb matrix and use them as training data. However, this approach may cause us to lose some information [1]. We decide not to follow this approach.
 
 **Sorting Coulomb matrix.** Since the ordering of atoms in the Coulomb matrix can be arbitrary, we would like to impose a specific row order on Coulomb matrices. One way to achieve this is to pick the permutation of atoms in Coulomb matrix $C$ such that
-$$
+
+$
 ||C_i||_2 \leq ||C_{i+1}||_2
-$$
+$
+
 with $C_i$ being the $i^{th}$ row of $C$. Note that two different molecules have necessarily different associated sorted Coulomb matrices [1, Section 2.2].
 
 **Using permutation invariant/equivariant algorithms.** Another method is to use permutation invariant or equivariant algorithms. Formal
@@ -109,7 +100,7 @@ In this section, we report the performance on QM7 dataset of $6$ different metho
 The detailed data pre-processing procedure for each method is described in the corresponding subsection below.
 
 ![Plots of the graphs corresponding to molecule 860, 5390, 5226, 5191
-and 3772](images/some_molecules.png){#fig:some_molecules}
+and 3772](images/some_molecules.png)
 
 ## Linear Regression
 
@@ -127,7 +118,7 @@ We perform experiment on Support Vector Regression with `scikit-learn` library. 
 
 We perform experiment on Gradient Boosted Trees with `XGBoost` library. The Coulomb matrices are sorted by row norms and then flatten, and the labels are rescaled. We perform 5-fold cross-validation, and obtain the minimum cross-validation loss of $8.78$ kcal/mol. The cross-validation is completed in $40.649$ seconds.
 
-![Training history of XGBoost](images/xgboost.png){#fig:xgboost}
+![Training history of XGBoost](images/xgboost.png)
 
 ## Neural Networks
 
@@ -137,7 +128,7 @@ We first attempt to learn the atomization energies by a vanilla neural network (
 
 The performance of vanilla neural network is significantly worse than the previous conventional non-linear methods since neural networks often require a very large dataset to work well, while QM7 only consists of $7165$ data points, which are relatively of small size.
 
-![Training history of vanilla neural network (error unscaled)](images/nn.png){#fig:nn}
+![Training history of vanilla neural network (error unscaled)](images/nn.png)
 
 ### Convolutional Neural Network with Binarization
 
@@ -145,14 +136,16 @@ Instead of vanilla neural network, we now construct a convolutional neural netwo
 
 Furthermore, following [1, Section 3.2], we convert the real-valued entries $c$ of Coulomb matrix to a \"binarized\" vector
 $\hat{\mathbf{c}}$:
-$$
+
+$
 \hat{\mathbf{c}} = \left[..., tanh\left(\frac{c-\theta}{\theta}\right), tanh\left(\frac{c}{\theta}\right), tanh\left(\frac{c+\theta}{\theta}\right), ...\right]
-$$
+$
+
 In this way, the data representation in Coulomb matrices are more flexible, (hopefully) enabling a better performance for neural network.
 
 In this experiment, we use a six-layer convolutional neural network. The input labels are rescaled, and the input Coulomb matrices are enlarged with the above binarization scheme (with $\theta=1$ and the width of $11$). The details of the model configuration are available in the attached file `atomization_energies_prediction.ipynb`. The training process takes $26.8$ minutes, and we achieve the minimum cross-validation loss of $9.5$ kcal/mol.
 
-![Training loss of last fold of CNN with binarization (unscaled error)](images/cnn.png){#fig:cnn}
+![Training loss of last fold of CNN with binarization (unscaled error)](images/cnn.png)
 
 ## Extra: Graph Neural Network
 
@@ -163,7 +156,7 @@ In this experiment, we use an implementation of `GCNConv` layer provided in PyTo
 
 Due to lack of computing resources, we are not able to fine-tune our GNN model, therefore the performance of the GNN model is much worse than previous models, achieving a final test loss of $193.376$ kcal/mol. However, with both theoretical and empirical evidence supporting GNN models in the literature, we believe that with proper implementation and sufficiently large dataset, GNN models can compete with conventional methods.
 
-![Training history of GCN](images/gnn.png){#fig:gnn}
+![Training history of GCN](images/gnn.png)
 
 # Closing Remarks
 
@@ -180,12 +173,6 @@ For a small dataset like QM7, we can see that sophisticated methods like neural 
 
 We also observe that data pre-processing plays a very important role in performance of the learning algorithms, especially data rescaling/normalization. For the issue of arbitrary permutations regarding Coulomb matrix, besides the naive method relying on fixing a row order based on their norms, we can further account for the noise by generating randomly sorted Coulomb matrix, which can enable us to achieve an even better results [1].
 
-A future direction would be to compare generalization rate (i.e. accuracy w.r.t. sample size) of neural network methods versus the traditional non-linear methods, to see when and why neural networks and graph neural network outperform conventional machine learning methods. However, a fair comparison is only possible if we can obtain a larger dataset than QM7.
-
-On the theoretical front, there has been several works regarding generalization rate of graph neural network models on graph-level tasks
-[@verma], [@garg], [@lv], [@esser], [@jegelka2022theorygnn]. However, from our experiment on graph neural network on QM7, different GCN
-configuration results in different performance. Hence, an interesting theoretical question would be to establish a generalization bound for GNN w.r.t. not only the sample size, but also the statistical and graph-theoretic property of the graphs in our dataset of interest. For example, there might be some graph-theoretic or statistical property of the graphs in QM7 dataset that makes some GNN configurations perform better than others. For a pioneering work, see [@esser] where the authors derive Rademacher Complexity for GNN on under a stochastic block model.
-
 # Appendix
 
 1.  Link to main experiments on Google Colab: [`atomization_energies_prediction.ipynb`](https://colab.research.google.com/drive/1ueCRkG1RuTgizpcGQIoZuih__RLANV8S?usp=sharing)
@@ -196,15 +183,17 @@ configuration results in different performance. Hence, an interesting theoretica
 # References
 
 [1] Grégoire Montavon et al. “Learning Invariant Representations of Molecules for Atomization Energy Prediction”. In: Advances in Neural Information Processing Systems. 2012.
+
 [2] Ryoma Sato. A Survey on The Expressive Power of Graph Neural Networks. 2020.
+
 [3] Fernando Gama, Joan Bruna, and Alejandro Ribeiro. “Stability Properties of Graph Neural Networks”. In: IEEE Transactions on Signal Processing (2020).
+
 [4] Haggai Maron et al. “Invariant and Equivariant Graph Networks”. In: International Conference on Learning Representations. 2019.
+
 [5] Ulrike von Luxburg. “A tutorial on spectral clustering”. In: Statistics and Computing (2007).
+
 [6] M. Newman. Networks. OUP Oxford, 2018. ISBN: 9780192527493.
+
 [7] Nino Shervashidze et al. “Weisfeiler-Lehman Graph Kernels”. In: Journal of Machine Learning Research (2011).
+
 [8] Thomas N. Kipf and Max Welling. “Semi-Supervised Classification with Graph Convolutional Networks”. In: International Conference on Learning Representations (ICLR). 2017.
-[9] Saurabh Verma and Zhi-Li Zhang. “Stability and Generalization of Graph Convolutional Neural Networks”. In: Proceedings of the 25th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining. KDD ’19. 2019.
-[10] Vikas Garg, Stefanie Jegelka, and Tommi Jaakkola. “Generalization and Representational Limits of Graph Neural Networks”. In: Proceedings of the 37th International Conference on Machine Learning. 2020.
-[11] Shaogao Lv. Generalization bounds for graph convolutional neural networks via Rademacher complexity. 2021.
-[12] Pascal Esser, Leena Chennuru Vankadara, and Debarghya Ghoshdastidar. “Learning Theory Can (Sometimes) Explain Generalisation in Graph Neural Networks”. In: Advances in Neural Information Processing Systems. Curran Associates, Inc., 2021.
-[13] Stefanie Jegelka. Theory of Graph Neural Networks: Representation and Learning. 2022.
