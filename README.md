@@ -1,21 +1,22 @@
-# Introduction
+# Introduction: QM7 Dataset
 
 ## Machine learning for quantum chemistry
 
 A crucial task in chemical compound design is to accurately predict molecular energetics. To circumvent computational cost, machine learning techniques are employed to speed-up the process while maintaining accuracy. The goal is to learn a map from a molecule to its atomization energy.
 
-In the language of machine learning, each molecule is represented by an undirected simple graph, where each node (atom) having a *nuclear
-charge* feature and each edge is weighted by *distance between two nodes (atoms)*. Our target function is a map between each graph (molecule) to a value called *atomization energy*. Hence, a possible perspective is that we are dealing with graph-level regression task.
+In the language of machine learning, each molecule is represented by an undirected simple graph, where each node (atom) having a *nuclear charge* feature and each edge is weighted by *distance between two nodes (atoms)*. Our target function is a map between each graph (molecule) to a value called *atomization energy*. Hence, a possible perspective is that we are dealing with graph-level regression task.
 
-We can either represent the data as a graph by a (weighted) adjacency matrix (as in the case of graph neural network), or simply flatten the nodes and the edges in the adjacency matrix of the molecular graph as our features for conventional machine learning methods.
+In this project, we will use `scikit-learn` and `pytorch-geometric` to investigate the performance of several machine learning algorithms in predicting the atomization energies of molecules.
 
 ## Molecular descriptor
+
+We can either represent the data as a graph by a (weighted) adjacency matrix (as in the case of graph neural network), or simply flatten the nodes and the edges in the adjacency matrix of the molecular graph as our features for conventional machine learning methods.
 
 A conventional way to represent molecules is to use Coulomb matrix
 $C = [C_{ij}]_{1 \leq i, j \leq 23}$ [1], with the entries being:
 
 $$
-C_{ij} = Z_{i}Z_{j}/|\mathbf{R}_{i} - \mathbf{R}_{j}|,\;i \neq j;\;C_{ii} = 0.5Z_{i}^{2.4}.
+C_{ij} = Z_{i}Z_{j}/|\mathbf{R}_{i} - \mathbf{R}_{j}|, i \neq j; C_{ii} = 0.5Z_{i}^{2.4}.
 $$
 
 where $Z_{i}$ is the nuclear charge of atom $i$ and $R_{i}$ is its Cartesian coordinates. Informally speaking, diagonal entries of Coulomb matrix represents strength of nuclear charge of each atom in the molecule, and the off-diagonal entries describe the interaction between two atoms based on their nuclear charges (with sign) and their absolute distance.
@@ -24,8 +25,7 @@ where $Z_{i}$ is the nuclear charge of atom $i$ and $R_{i}$ is its Cartesian coo
 
 ## Roadmap
 
-In the following sections, we will first discuss necessary data pre-processing of the QM7 dataset, then reporting performance of various
-machine learning methods. Finally, we give an informal discussion on when and why a method works on this dataset, and possible future research directions.
+In the following sections, we will first discuss necessary data pre-processing of the QM7 dataset, then reporting performance of various machine learning methods. Finally, we give an informal discussion on when and why a method works on this dataset.
 
 # Pre-processing data
 
@@ -56,7 +56,7 @@ Since each molecule has different number of atoms, their true Coulomb matrices h
 **Sorting Coulomb matrix.** Since the ordering of atoms in the Coulomb matrix can be arbitrary, we would like to impose a specific row order on Coulomb matrices. One way to achieve this is to pick the permutation of atoms in Coulomb matrix $C$ such that
 
 $$
-||C_{i}||_2 \leq ||C_{i+1}||_{2}
+||C_{i}||_{2} \leq ||C_{i+1}||_{2}
 $$
 
 with $C_{i}$ being the $i^{th}$ row of $C$. Note that two different molecules have necessarily different associated sorted Coulomb matrices [1, Section 2.2].
@@ -160,29 +160,29 @@ Due to lack of computing resources, we are not able to fine-tune our GNN model, 
 
 ![Training history of GCN](images/gnn.png)
 
-# Closing Remarks
+# Discussion
 
-**No.**   **Method**                   **CV Loss (kcal/mol)**   **Time (sec)**
---------- --------------------------- ------------------------ ----------------
-1         Linear Regression                     17.9                 0.62
-2         Kernel Ridge Regression               4.70                 11.8
-3         Support Vector Regression             6.50                 63.6
-4         XGBoost                               8.78                40.65
-5         Vanilla NN                            19.1                143.5
-6         CNN with Binarization                 9.25                1610.5
+| No. | Method | Cross-validation Loss (kcal/mol) | Running Time (sec) |
+| --- | --- | --- | --- |
+| Linear Regression | 17.9 | 0.62 |
+| Kernel Ridge Regression | 4.70 | 11.8 |
+| Support Vector Regression | 6.50 | 63.6 |
+| XGBoost | 8.78 | 40.65 |
+| Vanilla NN | 19.1 | 143.5 |
+| CNN with Binarization | 9.25 | 1610.5 |
 
 For a small dataset like QM7, we can see that sophisticated methods like neural network and graph neural network may not perform well since these methods often require a large amount of data. Instead, simple non-linear methods like kernel ridge regression, support vector regression and gradient boosted decision trees are more efficient in execution time and also achieve a much better accuracy.
 
 We also observe that data pre-processing plays a very important role in performance of the learning algorithms, especially data rescaling/normalization. For the issue of arbitrary permutations regarding Coulomb matrix, besides the naive method relying on fixing a row order based on their norms, we can further account for the noise by generating randomly sorted Coulomb matrix, which can enable us to achieve an even better results [1].
 
-# Appendix
+## Appendix
 
 1.  Link to main experiments on Google Colab: [`atomization_energies_prediction.ipynb`](https://colab.research.google.com/drive/1ueCRkG1RuTgizpcGQIoZuih__RLANV8S?usp=sharing)
 
 2.  Link to extra experiment (graph neural network) on Google Colab: [`gnn_qm7.ipynb`](https://colab.research.google.com/drive/1GcIwjTfvigVL3o0jE4YgsE_bMnJcIh9t?usp=sharing)
 
 
-# References
+## References
 
 [1] Grégoire Montavon et al. “Learning Invariant Representations of Molecules for Atomization Energy Prediction”. In: Advances in Neural Information Processing Systems. 2012.
 
