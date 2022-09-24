@@ -1,4 +1,4 @@
-# Introduction: QM7 Dataset
+# Intro: Predicting Atomization Energies
 
 ## Machine learning for quantum chemistry
 
@@ -16,16 +16,12 @@ A conventional way to represent molecules is to use Coulomb matrix
 $C = [C_{ij}]_{1 \leq i, j \leq 23}$ [1], with the entries being:
 
 $$
-C_{ij} = Z_{i}Z_{j}/|\mathbf{R}_{i} - \mathbf{R}_{j}|, i \neq j; C_{ii} = 0.5Z_{i}^{2.4}.
+C_{ij} = \frac{Z_{i}Z_{j}}{|R_{i} - R_{j}|}, i \neq j; C_{ii} = 0.5Z_{i}^{2.4}.
 $$
 
 where $Z_{i}$ is the nuclear charge of atom $i$ and $R_{i}$ is its Cartesian coordinates. Informally speaking, diagonal entries of Coulomb matrix represents strength of nuclear charge of each atom in the molecule, and the off-diagonal entries describe the interaction between two atoms based on their nuclear charges (with sign) and their absolute distance.
 
 **Limitations.** Although Coulomb matrix is invariant to translation and rotation of the molecule, it is *not invariant to permutation of atoms indices*. In addition, Coulomb matrices may have different sizes, but this is not a problem since in QM7 dataset we are only considering molecules with $23$ atoms. Lastly, molecular representation by Coulomb matrices alone misses many important features as a molecule lives in a continuous 3D space (e.g., Coulomb matrix misses angular information between atoms; consideration of rotational-invariance and equivariance).
-
-## Roadmap
-
-In the following sections, we will first discuss necessary data pre-processing of the QM7 dataset, then reporting performance of various machine learning methods. Finally, we give an informal discussion on when and why a method works on this dataset.
 
 # Pre-processing data
 
@@ -164,12 +160,12 @@ Due to lack of computing resources, we are not able to fine-tune our GNN model, 
 
 | No. | Method | Cross-validation Loss (kcal/mol) | Running Time (sec) |
 | --- | --- | --- | --- |
-| Linear Regression | 17.9 | 0.62 |
-| Kernel Ridge Regression | 4.70 | 11.8 |
-| Support Vector Regression | 6.50 | 63.6 |
-| XGBoost | 8.78 | 40.65 |
-| Vanilla NN | 19.1 | 143.5 |
-| CNN with Binarization | 9.25 | 1610.5 |
+| 1 | Linear Regression | 17.9 | 0.62 |
+| 2 | Kernel Ridge Regression | 4.70 | 11.8 |
+| 3 | Support Vector Regression | 6.50 | 63.6 |
+| 4 | XGBoost | 8.78 | 40.65 |
+| 5 | Vanilla NN | 19.1 | 143.5 |
+| 6 | CNN with Binarization | 9.25 | 1610.5 |
 
 For a small dataset like QM7, we can see that sophisticated methods like neural network and graph neural network may not perform well since these methods often require a large amount of data. Instead, simple non-linear methods like kernel ridge regression, support vector regression and gradient boosted decision trees are more efficient in execution time and also achieve a much better accuracy.
 
