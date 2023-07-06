@@ -54,7 +54,7 @@ Since each molecule has different number of atoms, their true Coulomb matrices h
 **Sorting Coulomb matrix.** Since the ordering of atoms in the Coulomb matrix can be arbitrary, we would like to impose a specific row order on Coulomb matrices. One way to achieve this is to pick the permutation of atoms in Coulomb matrix $C$ such that
 
 $$
-||C_{i}||_{2} \leq C_{i+1}||_{2}
+||C_{i}|| \leq ||C_{i+1}||
 $$
 
 with $C_{i}$ being the $i^{th}$ row of $C$. Note that two different molecules have necessarily different associated sorted Coulomb matrices [1, Section 2.2].
